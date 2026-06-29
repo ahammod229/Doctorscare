@@ -21,7 +21,7 @@ export function AdminAppointments() {
 
   useEffect(() => { refreshAdminAppointments(statusFilter || undefined, dateFilter || undefined) }, [statusFilter, dateFilter])
 
-  const filtered = Array.isArray(appointments) ? appointments.filter(a => {
+  const filtered = (Array.isArray(appointments) ? appointments : []).filter(a => {
     if (search) {
       const s = search.toLowerCase()
       const match = a.patient?.name?.toLowerCase().includes(s) || a.doctor?.user?.name?.toLowerCase().includes(s) || a.doctor?.specialty?.toLowerCase().includes(s)
