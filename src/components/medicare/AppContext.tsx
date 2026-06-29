@@ -164,7 +164,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (status) params.set('status', status)
       if (date) params.set('date', date)
       const a = await api('/api/admin/appointments?' + params.toString())
-      setState(s => ({ ...s, appointments: a }))
+      const list = Array.isArray(a) ? a : a.appointments || []
+      setState(s => ({ ...s, appointments: list }))
     } catch {}
   }, [api])
 

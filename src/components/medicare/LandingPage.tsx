@@ -99,12 +99,12 @@ export function LandingPage() {
                 </div>
                 <div className="p-3 rounded-lg bg-white border border-emerald-100">
                   <p className="font-bold text-emerald-600 mb-1">Doctor</p>
-                  <p className="text-slate-600">ayesha@binimoy.com</p>
+                  <p className="text-slate-600">ayesha@doctorscare.com</p>
                   <p className="text-slate-400">doctor123</p>
                 </div>
                 <div className="p-3 rounded-lg bg-white border border-sky-100">
                   <p className="font-bold text-sky-600 mb-1">Admin</p>
-                  <p className="text-slate-600">admin@binimoy.com</p>
+                  <p className="text-slate-600">admin@doctorscare.com</p>
                   <p className="text-slate-400">admin123</p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export function LandingPage() {
               <div className="w-8 h-8 rounded-lg gradient-medical flex items-center justify-center">
                 <span className="text-white text-lg">+</span>
               </div>
-              <span className="text-lg font-bold">Binimoy</span>
+              <span className="text-lg font-bold">Doctors Care</span>
             </div>
             <p className="text-slate-400 text-sm">Doctor Appointment Management System — DBMS Project</p>
             <div className="flex items-center gap-1 text-sm text-slate-400"><Phone className="w-4 h-4" /> Emergency: 999</div>

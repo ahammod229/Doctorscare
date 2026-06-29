@@ -35,7 +35,7 @@ export function Navbar() {
               <Stethoscope className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-700 via-sky-600 to-emerald-600 bg-clip-text text-transparent">
-              Binimoy
+              Doctors Care
             </span>
           </button>
 
