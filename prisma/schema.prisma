@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,18 +9,93 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
+  name      String
   email     String   @unique
-  name      String?
+  password  String
+  phone     String?
+  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN
+  avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  doctor              Doctor?
+  prescriptions       Prescription[] @relation("DoctorPrescriptions")
 }
 
-model Post {
+model Doctor {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  specialty    String
+  qualification String?
+  experience   Int      @default(0)
+  bio          String?
+  fee          Float    @default(0)
+  departmentId String
+  availableDays String   @default("Mon,Tue,Wed,Thu,Fri")
+  startTime    String   @default("09:00")
+  endTime      String   @default("17:00")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  department  Department  @relation(fields: [departmentId], references: [id])
+  appointments Appointment[]
+  timeSlots   DoctorTimeSlot[]
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  doctors Doctor[]
+}
+
+model Appointment {
+  id           String   @id @default(cuid())
+  patientId    String
+  doctorId     String
+  date         String
+  timeSlot     String
+  status       String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  reason       String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  patient      User     @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor       Doctor   @relation(fields: [doctorId], references: [id])
+  prescription Prescription?
+}
+
+model Prescription {
+  id             String   @id @default(cuid())
+  appointmentId  String   @unique
+  doctorId       String
+  patientId      String
+  diagnosis      String
+  medications    String
+  instructions   String?
+  followUpDate   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  doctor      User        @relation("DoctorPrescriptions", fields: [doctorId], references: [id])
+}
+
+model DoctorTimeSlot {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  doctorId  String
+  date      String
+  startTime String
+  endTime   String
+  isBooked  Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
