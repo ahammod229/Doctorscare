@@ -31,10 +31,10 @@ export function AdminDoctors() {
   const handleSave = async () => {
     try {
       if (editing) {
-        await api('/api/admin/doctors', { method: 'PUT', body: JSON.stringify({ doctorId: editing.id, ...form, experience: parseInt(form.experience), fee: parseInt(form.fee) }) })
+        await api('/api/admin/doctors', { method: 'PUT', body: JSON.stringify({ doctorId: editing.id, ...form, experience: parseInt(form.experience || '0'), fee: parseInt(form.fee || '0') }) })
         showToast('Doctor updated', 'success')
       } else {
-        await api('/api/admin/doctors', { method: 'POST', body: JSON.stringify({ ...form, experience: parseInt(form.experience), fee: parseInt(form.fee) }) })
+        await api('/api/admin/doctors', { method: 'POST', body: JSON.stringify({ ...form, experience: parseInt(form.experience || '0'), fee: parseInt(form.fee || '0') }) })
         showToast('Doctor added', 'success')
       }
       setOpen(false); setEditing(null); loadDoctors()
@@ -88,7 +88,7 @@ export function AdminDoctors() {
                     <div className="flex flex-wrap gap-1 mt-1">
                       <Badge variant="secondary" className="text-xs">{doc.department.name}</Badge>
                       <Badge variant="outline" className="text-xs">{doc.experience}yr</Badge>
-                      <Badge variant="outline" className="text-xs">৳{doc.fee}</Badge>
+                      <Badge variant="outline" className="text-xs">${doc.fee}</Badge>
                     </div>
                   </div>
                 </div>
@@ -109,13 +109,13 @@ export function AdminDoctors() {
           <div className="space-y-3">
             <div><Label>Name *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="mt-1 border-blue-200" /></div>
             <div><Label>Email *</Label><Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1 border-blue-200" /></div>
-            {!editing && <div><Label>Password *</Label><Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className="mt-1 border-blue-200" /></div>}
+            <div><Label>{editing ? 'New Password (optional)' : 'Password *'}</Label><Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className="mt-1 border-blue-200" placeholder={editing ? "Leave blank to keep current" : ""} /></div>
             <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="mt-1 border-blue-200" /></div>
             <div><Label>Specialty *</Label><Input value={form.specialty} onChange={e => setForm(f => ({ ...f, specialty: e.target.value }))} className="mt-1 border-blue-200" /></div>
             <div><Label>Qualification</Label><Input value={form.qualification} onChange={e => setForm(f => ({ ...f, qualification: e.target.value }))} className="mt-1 border-blue-200" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Experience (yrs)</Label><Input type="number" value={form.experience} onChange={e => setForm(f => ({ ...f, experience: e.target.value }))} className="mt-1 border-blue-200" /></div>
-              <div><Label>Fee (৳)</Label><Input type="number" value={form.fee} onChange={e => setForm(f => ({ ...f, fee: e.target.value }))} className="mt-1 border-blue-200" /></div>
+              <div><Label>Fee ($)</Label><Input type="number" value={form.fee} onChange={e => setForm(f => ({ ...f, fee: e.target.value }))} className="mt-1 border-blue-200" /></div>
             </div>
             <div><Label>Department *</Label>
               <Select value={form.departmentId} onValueChange={v => setForm(f => ({ ...f, departmentId: v }))}>

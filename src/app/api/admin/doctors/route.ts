@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { doctorId, name, email, phone, specialty, qualification, experience, fee, departmentId, availableDays, startTime, endTime } = await req.json()
+    const { doctorId, name, email, password, phone, specialty, qualification, experience, fee, departmentId, availableDays, startTime, endTime } = await req.json()
 
     if (!doctorId) {
       return NextResponse.json({ error: 'doctorId is required' }, { status: 400 })
@@ -77,6 +77,11 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Doctor not found' }, { status: 404 })
     }
 
+    let hashedPassword = undefined
+    if (password && password.trim() !== '') {
+      hashedPassword = await hash(password, 10)
+    }
+
     const updated = await db.$transaction(async (tx) => {
       // Update user fields
       await tx.user.update({
@@ -84,6 +89,7 @@ export async function PUT(req: Request) {
         data: {
           ...(name && { name }),
           ...(email && { email }),
+          ...(hashedPassword && { password: hashedPassword }),
           ...(phone !== undefined && { phone }),
         },
       })

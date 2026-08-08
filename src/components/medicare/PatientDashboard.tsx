@@ -22,7 +22,7 @@ export function PatientDashboard() {
   }, [user?.id])
 
   const today = new Date().toISOString().split('T')[0]
-  const upcoming = appointments.filter(a => a.date >= today && a.status !== 'CANCELLED')
+  const upcoming = appointments.filter(a => a.date >= today && a.status !== 'CANCELLED' && a.status !== 'COMPLETED')
   const past = appointments.filter(a => a.date < today || a.status === 'COMPLETED' || a.status === 'CANCELLED')
   const list = tab === 'upcoming' ? upcoming : past
 
@@ -41,10 +41,10 @@ export function PatientDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total Appointments', value: stats?.totalAppointments || 0, icon: <Calendar className="w-5 h-5" />, color: 'text-blue-600 bg-blue-50' },
-          { label: 'Pending', value: stats?.pendingAppointments || 0, icon: <Hourglass className="w-5 h-5" />, color: 'text-amber-600 bg-amber-50' },
-          { label: 'Completed', value: stats?.completedAppointments || 0, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-emerald-600 bg-emerald-50' },
-          { label: 'Departments', value: stats?.totalDepartments || 0, icon: <AlertCircle className="w-5 h-5" />, color: 'text-sky-600 bg-sky-50' },
+          { label: 'Total Appointments', value: appointments.length, icon: <Calendar className="w-5 h-5" />, color: 'text-blue-600 bg-blue-50' },
+          { label: 'Pending', value: appointments.filter(a => a.status === 'PENDING' || a.status === 'CONFIRMED').length, icon: <Hourglass className="w-5 h-5" />, color: 'text-amber-600 bg-amber-50' },
+          { label: 'Completed', value: appointments.filter(a => a.status === 'COMPLETED').length, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-emerald-600 bg-emerald-50' },
+          { label: 'Cancelled', value: appointments.filter(a => a.status === 'CANCELLED').length, icon: <AlertCircle className="w-5 h-5" />, color: 'text-red-600 bg-red-50' },
         ].map((s, i) => (
           <Card key={i} className="border-0 shadow-sm">
             <CardContent className="p-4 flex items-center gap-3">

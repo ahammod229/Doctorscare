@@ -24,6 +24,7 @@ export async function GET(req: Request) {
               department: { select: { id: true, name: true } },
             },
           },
+          prescription: true,
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,

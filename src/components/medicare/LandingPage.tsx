@@ -35,7 +35,7 @@ export function LandingPage() {
               <Button size="lg" className="bg-white text-blue-800 hover:bg-blue-50 font-semibold px-8 shadow-xl shadow-black/10" onClick={() => setView('register')}>
                 Book Appointment <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 px-8" onClick={() => setView('browse-doctors')}>
+              <Button size="lg" variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-blue-900 px-8" onClick={() => setView('browse-doctors')}>
                 Find Doctors <Search className="w-4 h-4 ml-2" />
               </Button>
             </div>

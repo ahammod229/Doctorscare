@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 export type UserRole = 'PATIENT' | 'DOCTOR' | 'ADMIN' | null
-export type ViewType = 'landing' | 'login' | 'register' | 'patient-dashboard' | 'browse-doctors' | 'doctor-profile' | 'book-appointment' | 'appointment-detail' | 'doctor-dashboard' | 'admin-dashboard' | 'admin-doctors' | 'admin-departments' | 'admin-appointments'
+export type ViewType = 'landing' | 'login' | 'register' | 'patient-dashboard' | 'patient-profile' | 'browse-doctors' | 'doctor-profile' | 'book-appointment' | 'appointment-detail' | 'doctor-dashboard' | 'admin-dashboard' | 'admin-doctors' | 'admin-departments' | 'admin-appointments'
 
 export interface AppUser {
   id: string; name: string; email: string; role: UserRole; phone?: string;
@@ -60,6 +60,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     selectedDoctor: null, selectedAppointment: null, stats: null, timeSlots: [], loading: false, toast: null,
   })
 
+  // Load state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('dc_user')
+      const savedView = localStorage.getItem('dc_view')
+      if (savedUser) {
+        setState(s => ({ ...s, user: JSON.parse(savedUser), view: savedView as ViewType || 'landing' }))
+      } else if (savedView) {
+        setState(s => ({ ...s, view: savedView as ViewType }))
+      }
+    } catch (e) {
+      console.error("Failed to parse saved user", e)
+    }
+  }, [])
+
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info') => {
     setState(s => ({ ...s, toast: { message, type } }))
     setTimeout(() => setState(s => ({ ...s, toast: null })), 3000)
@@ -75,7 +90,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     try {
       const user = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
-      setState(s => ({ ...s, user, view: user.role === 'ADMIN' ? 'admin-dashboard' : user.role === 'DOCTOR' ? 'doctor-dashboard' : 'patient-dashboard' }))
+      const defaultView = user.role === 'ADMIN' ? 'admin-dashboard' : user.role === 'DOCTOR' ? 'doctor-dashboard' : 'patient-dashboard'
+      setState(s => ({ ...s, user, view: defaultView }))
+      localStorage.setItem('dc_user', JSON.stringify(user))
+      localStorage.setItem('dc_view', defaultView)
       showToast('Welcome back, ' + user.name + '!', 'success')
       return true
     } catch { showToast('Invalid credentials', 'error'); return false }
@@ -91,6 +109,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     setState(s => ({ ...s, user: null, view: 'landing', appointments: [], selectedDoctor: null, selectedAppointment: null, timeSlots: [] }))
+    localStorage.removeItem('dc_user')
+    localStorage.removeItem('dc_view')
     showToast('Logged out successfully', 'info')
   }, [showToast])
 
@@ -120,7 +140,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [api])
 
   const loadStats = useCallback(async () => {
-    try { const s = await api('/api/stats'); setState(s => ({ ...s, stats: s })) } catch {}
+    try { const data = await api('/api/stats'); setState(s => ({ ...s, stats: data })) } catch {}
   }, [api])
 
   const loadTimeSlots = useCallback(async (doctorId: string, date: string) => {
@@ -169,8 +189,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [api])
 
-  const setView = useCallback((v: ViewType) => setState(s => ({ ...s, view: v })), [])
-  const setUser = useCallback((u: AppUser | null) => setState(s => ({ ...s, user: u })), [])
+  const setView = useCallback((v: ViewType) => {
+    setState(s => ({ ...s, view: v }))
+    localStorage.setItem('dc_view', v)
+  }, [])
+  const setUser = useCallback((u: AppUser | null) => {
+    setState(s => ({ ...s, user: u }))
+    if (u) localStorage.setItem('dc_user', JSON.stringify(u))
+    else localStorage.removeItem('dc_user')
+  }, [])
   const selectDoctor = useCallback((d: Doctor) => setState(s => ({ ...s, selectedDoctor: d })), [])
   const selectAppointment = useCallback((a: Appointment) => setState(s => ({ ...s, selectedAppointment: a })), [])
 

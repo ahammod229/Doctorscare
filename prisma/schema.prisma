@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -21,6 +22,7 @@ model User {
   patientAppointments Appointment[] @relation("PatientAppointments")
   doctor              Doctor?
   prescriptions       Prescription[] @relation("DoctorPrescriptions")
+  documents           PatientDocument[] @relation("PatientDocuments")
 }
 
 model Doctor {
@@ -98,4 +100,15 @@ model DoctorTimeSlot {
   createdAt DateTime @default(now())
 
   doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model PatientDocument {
+  id        String   @id @default(cuid())
+  patientId String
+  title     String
+  fileData  String   // Base64 string of the file
+  fileType  String   // MIME type e.g. application/pdf, image/png
+  createdAt DateTime @default(now())
+
+  patient   User @relation("PatientDocuments", fields: [patientId], references: [id], onDelete: Cascade)
 }

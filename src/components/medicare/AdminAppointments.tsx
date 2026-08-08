@@ -30,7 +30,7 @@ export function AdminAppointments() {
     return true
   })
 
-  const handleAction = async (id: string, action: () => Promise<boolean>) => {
+  const handleAction = async (id: string, action: (id: string) => Promise<boolean>) => {
     await action(id)
     refreshAdminAppointments(statusFilter || undefined, dateFilter || undefined)
   }

@@ -3,7 +3,7 @@ import { useApp } from './AppContext'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Stethoscope, LogOut, LayoutDashboard, UserPlus, Search, Menu, Home } from 'lucide-react'
+import { Stethoscope, LogOut, LayoutDashboard, UserPlus, Search, Menu, Home, User } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
 
 export function Navbar() {
@@ -13,6 +13,7 @@ export function Navbar() {
   const patientLinks = [
     { label: 'Dashboard', view: 'patient-dashboard' as const, icon: <LayoutDashboard className="w-4 h-4" /> },
     { label: 'Find Doctors', view: 'browse-doctors' as const, icon: <Search className="w-4 h-4" /> },
+    { label: 'My Profile', view: 'patient-profile' as const, icon: <User className="w-4 h-4" /> },
   ]
   const doctorLinks = [
     { label: 'Dashboard', view: 'doctor-dashboard' as const, icon: <LayoutDashboard className="w-4 h-4" /> },
