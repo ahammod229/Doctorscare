@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User, Mail, Phone, Lock, Save, Shield, Calendar, CheckCircle2 } from 'lucide-react'
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { app } from '@/lib/firebase'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export function PatientProfile() {
   const { user, setUser, showToast, appointments } = useApp()
@@ -244,6 +243,7 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
   const [uploading, setUploading] = useState(false)
   const [title, setTitle] = useState('')
   const [file, setFile] = useState<File | null>(null)
+  const [viewDocument, setViewDocument] = useState<any | null>(null)
 
   const fetchDocuments = async () => {
     if (!patientId) return;
@@ -378,18 +378,7 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
                     variant="outline" 
                     size="sm" 
                     className="text-xs h-8 text-blue-600 border-blue-200"
-                    onClick={() => {
-                      // Open URL in new tab
-                      if (doc.fileData.startsWith('http')) {
-                        window.open(doc.fileData, '_blank');
-                      } else {
-                        // Fallback for old base64 docs (if any)
-                        const win = window.open();
-                        if (win) {
-                          win.document.write(`<iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
-                        }
-                      }
-                    }}
+                    onClick={() => setViewDocument(doc)}
                   >
                     View File
                   </Button>
@@ -407,6 +396,21 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
           </div>
         )}
       </div>
+
+      <Dialog open={!!viewDocument} onOpenChange={(open) => !open && setViewDocument(null)}>
+        <DialogContent className="max-w-4xl w-full h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{viewDocument?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 w-full bg-slate-100 rounded-md overflow-hidden flex items-center justify-center">
+            {viewDocument?.fileType?.startsWith('image/') ? (
+              <img src={viewDocument.fileData} alt={viewDocument.title} className="max-w-full max-h-full object-contain" />
+            ) : viewDocument?.fileData ? (
+              <iframe src={viewDocument.fileData} className="w-full h-full border-0" title={viewDocument.title} />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
