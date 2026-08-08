@@ -281,9 +281,8 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
       const downloadURL = await getDownloadURL(snapshot.ref)
       
       // 2. Save URL to database
-      const res = await fetch('/api/patient/documents', {
+      await api('/api/patient/documents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           patientId,
           fileName: title,
@@ -291,15 +290,20 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
           fileUrl: downloadURL,
         })
       })
-
-      if (!res.ok) throw new Error('Failed to save document record')
       
       showToast('Document uploaded successfully!', 'success')
       setTitle('')
       setFile(null)
       fetchDocuments()
     } catch (e: any) {
-      showToast(e.message || 'Upload failed', 'error')
+      console.error("Upload error:", e)
+      if (e.message?.includes("unauthorized") || e.code === "storage/unauthorized") {
+        showToast('Storage Permission Denied. Please enable Firebase Storage rules.', 'error')
+      } else if (e.message?.includes("bucket")) {
+        showToast('Firebase Storage is not enabled in your Firebase Console.', 'error')
+      } else {
+        showToast(e.message || 'Upload failed. Please check console.', 'error')
+      }
     } finally {
       setUploading(false)
     }
