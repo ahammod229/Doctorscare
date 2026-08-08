@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     // Create the reset link using the actual host domain
     const origin = req.headers.get('origin') || 'https://doctorscare-dbms.vercel.app'
-    const resetLink = `${origin}/?token=${resetToken}`
+    const resetLink = `${origin}/?view=reset-password&token=${resetToken}`
 
     // Send the email via Resend
     await resend.emails.send({
