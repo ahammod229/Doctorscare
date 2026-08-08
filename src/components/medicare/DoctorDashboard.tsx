@@ -16,7 +16,7 @@ const statusColor: Record<string, string> = {
 }
 
 export function DoctorDashboard() {
-  const { user, appointments, loadAppointments, loadStats, stats, confirmAppointment, completeAppointment, createPrescription, showToast, selectAppointment } = useApp()
+  const { user, appointments, loadAppointments, loadStats, stats, confirmAppointment, completeAppointment, createPrescription, showToast, selectAppointment, setView } = useApp()
   const [tab, setTab] = useState<'today' | 'all' | 'completed'>('today')
   const [rxOpen, setRxOpen] = useState(false)
   const [rxApt, setRxApt] = useState<any>(null)
@@ -116,7 +116,7 @@ export function DoctorDashboard() {
                 <Badge className={statusColor[apt.status]}>{apt.status}</Badge>
                 {apt.prescription && <Badge className="bg-emerald-100 text-emerald-700"><FileText className="w-3 h-3 mr-1" /> Rx</Badge>}
                 <ViewRecordsDialog patientId={apt.patientId} patientName={apt.patient?.name} />
-                <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => selectAppointment(apt)}>
+                <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => { selectAppointment(apt); setView('appointment-detail') }}>
                   View
                 </Button>
                 {apt.status === 'PENDING' && (
