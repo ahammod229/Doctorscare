@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Calendar, CheckCircle2, Clock, Users, FileText, XCircle, HeartPulse, AlertCircle, ClipboardList } from 'lucide-react'
+import { Calendar, CheckCircle2, Clock, Users, FileText, XCircle, HeartPulse, AlertCircle, ClipboardList, ZoomIn, ZoomOut, Printer } from 'lucide-react'
 
 const statusColor: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700', CONFIRMED: 'bg-blue-100 text-blue-700',
@@ -179,21 +179,35 @@ export function DoctorDashboard() {
 }
 
 function ViewRecordsDialog({ patientId, patientName }: { patientId: string, patientName: string }) {
+  const { api } = useApp()
   const [open, setOpen] = useState(false)
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [viewDocument, setViewDocument] = useState<any | null>(null)
+  const [zoom, setZoom] = useState(1)
 
   const fetchDocs = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/patient/documents?patientId=${patientId}`)
-      if (res.ok) {
-        setDocuments(await res.json())
-      }
+      const data = await api(`/api/patient/documents?patientId=${patientId}`)
+      setDocuments(data)
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePrint = () => {
+    if (!viewDocument) return
+    const win = window.open('')
+    if (win) {
+      if (viewDocument.fileType?.startsWith('image/')) {
+        win.document.write(`<html><head><title>${viewDocument.title}</title></head><body style="margin:0;display:flex;justify-content:center;align-items:flex-start;"><img src="${viewDocument.fileData}" style="max-width:100%;" onload="setTimeout(() => { window.print(); window.close(); }, 500)" /></body></html>`)
+      } else {
+        win.document.write(`<html><head><title>${viewDocument.title}</title></head><body style="margin:0;"><iframe src="${viewDocument.fileData}" style="width:100%;height:100vh;border:none;" onload="setTimeout(() => { window.print(); window.close(); }, 500)"></iframe></body></html>`)
+      }
+      win.document.close()
     }
   }
 
@@ -230,12 +244,7 @@ function ViewRecordsDialog({ patientId, patientName }: { patientId: string, pati
                     variant="outline" 
                     size="sm" 
                     className="w-full text-xs h-8 text-blue-600 border-blue-200"
-                    onClick={() => {
-                      const win = window.open();
-                      if (win) {
-                        win.document.write(`<iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
-                      }
-                    }}
+                    onClick={() => setViewDocument(doc)}
                   >
                     Open Document
                   </Button>
@@ -245,6 +254,47 @@ function ViewRecordsDialog({ patientId, patientName }: { patientId: string, pati
           )}
         </div>
       </DialogContent>
+
+      {/* Document Viewer Modal */}
+      <Dialog open={!!viewDocument} onOpenChange={(open) => {
+        if (!open) {
+          setViewDocument(null)
+          setZoom(1)
+        }
+      }}>
+        <DialogContent className="max-w-4xl w-full h-[90vh] flex flex-col z-[100]">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle>{viewDocument?.title}</DialogTitle>
+            <div className="flex items-center gap-2 pr-8">
+              {viewDocument?.fileType?.startsWith('image/') && (
+                <>
+                  <Button variant="outline" size="icon" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))} title="Zoom Out">
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => setZoom(z => Math.min(3, z + 0.25))} title="Zoom In">
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" size="icon" onClick={handlePrint} title="Print">
+                <Printer className="w-4 h-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 w-full bg-slate-100 rounded-md overflow-auto flex items-center justify-center relative">
+            {viewDocument?.fileType?.startsWith('image/') ? (
+              <img 
+                src={viewDocument.fileData} 
+                alt={viewDocument.title} 
+                className="max-w-full max-h-full object-contain transition-transform duration-200" 
+                style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+              />
+            ) : viewDocument?.fileData ? (
+              <iframe src={viewDocument.fileData} className="w-full h-full border-0" title={viewDocument.title} />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   )
 }
