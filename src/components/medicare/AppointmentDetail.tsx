@@ -43,9 +43,14 @@ export function AppointmentDetail() {
           </head>
           <body>
             <div class="header">
-              <div>
-                <div class="clinic-name">+ Doctors Care</div>
-                <div style="font-size: 12px; color: #64748b; mt: 5px;">Emergency: 999</div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="background: linear-gradient(135deg, #1d4ed8, #0284c7, #059669); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
+                </div>
+                <div>
+                  <div class="clinic-name">Doctors Care</div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Emergency: 999</div>
+                </div>
               </div>
               <div class="doc-info">
                 <div class="doc-name">${apt.doctor?.user?.name || 'Doctor'}</div>
