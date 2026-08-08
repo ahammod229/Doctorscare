@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 export type UserRole = 'PATIENT' | 'DOCTOR' | 'ADMIN' | null
-export type ViewType = 'landing' | 'login' | 'register' | 'patient-dashboard' | 'patient-profile' | 'browse-doctors' | 'doctor-profile' | 'book-appointment' | 'appointment-detail' | 'doctor-dashboard' | 'admin-dashboard' | 'admin-doctors' | 'admin-departments' | 'admin-appointments'
+export type ViewType = 'landing' | 'login' | 'register' | 'forgot-password' | 'reset-password' | 'patient-dashboard' | 'patient-profile' | 'browse-doctors' | 'doctor-profile' | 'book-appointment' | 'appointment-detail' | 'doctor-dashboard' | 'admin-dashboard' | 'admin-doctors' | 'admin-departments' | 'admin-appointments'
 
 export interface AppUser {
   id: string; name: string; email: string; role: UserRole; phone?: string;
@@ -70,6 +70,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } else if (savedView) {
         setState(s => ({ ...s, view: savedView as ViewType }))
       }
+
+      // Check for reset password token in URL
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const token = urlParams.get('token')
+        const viewParam = urlParams.get('view')
+        if (token && viewParam === 'reset-password') {
+          setState(s => ({ ...s, view: 'reset-password' }))
+        }
+      }
     } catch (e) {
       console.error("Failed to parse saved user", e)
     }
@@ -81,7 +91,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const api = useCallback(async (url: string, options?: RequestInit) => {
-    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options })
+    // Read user from localStorage to inject X-User-Id header for simple security
+    const uStr = localStorage.getItem('dc_user')
+    const userId = uStr ? JSON.parse(uStr).id : ''
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (userId) headers['X-User-Id'] = userId
+
+    const res = await fetch(url, { headers, ...options })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Request failed')
     return data
@@ -146,7 +162,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const loadTimeSlots = useCallback(async (doctorId: string, date: string) => {
     try {
       const ts = await api(`/api/timeslots?doctorId=${doctorId}&date=${date}`)
-      setState(s => ({ ...s, timeSlots: ts }))
+      setState(s => ({ ...s, timeSlots: ts.slots || [] }))
     } catch {}
   }, [api])
 

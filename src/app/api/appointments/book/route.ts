@@ -9,6 +9,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'patientId, doctorId, date, and timeSlot are required' }, { status: 400 })
     }
 
+    const userId = req.headers.get('X-User-Id')
+    if (userId !== patientId) {
+      return NextResponse.json({ error: 'Unauthorized to book appointment for this patient' }, { status: 403 })
+    }
+
     // Check if the time slot is already booked
     const existingSlot = await db.doctorTimeSlot.findFirst({
       where: { doctorId, date, startTime: timeSlot, isBooked: true },

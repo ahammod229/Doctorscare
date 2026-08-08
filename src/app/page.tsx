@@ -15,6 +15,8 @@ import { AdminDoctors } from '@/components/medicare/AdminDoctors'
 import { AdminDepartments } from '@/components/medicare/AdminDepartments'
 import { AdminAppointments } from '@/components/medicare/AdminAppointments'
 import { PatientProfile } from '@/components/medicare/PatientProfile'
+import { ForgotPasswordPage } from '@/components/medicare/ForgotPasswordPage'
+import { ResetPasswordPage } from '@/components/medicare/ResetPasswordPage'
 
 function AppRouter() {
   const { view } = useApp()
@@ -23,6 +25,8 @@ function AppRouter() {
     'landing': <LandingPage />,
     'login': <LoginPage />,
     'register': <RegisterPage />,
+    'forgot-password': <ForgotPasswordPage />,
+    'reset-password': <ResetPasswordPage />,
     'patient-dashboard': <PatientDashboard />,
     'patient-profile': <PatientProfile />,
     'browse-doctors': <BrowseDoctors />,

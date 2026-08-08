@@ -19,6 +19,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
   patientAppointments Appointment[] @relation("PatientAppointments")
   doctor              Doctor?
   prescriptions       Prescription[] @relation("DoctorPrescriptions")

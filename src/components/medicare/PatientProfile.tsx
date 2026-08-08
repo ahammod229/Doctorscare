@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User, Mail, Phone, Lock, Save, Shield, Calendar, CheckCircle2 } from 'lucide-react'
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { app } from '@/lib/firebase'
 
 export function PatientProfile() {
   const { user, setUser, showToast, appointments } = useApp()
@@ -271,29 +273,31 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
 
     setUploading(true)
     try {
-      // Convert file to Base64
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = async () => {
-        const fileData = reader.result as string
-        
-        const res = await fetch('/api/patient/documents', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            fileType: file.type,
-            fileData,
-          })
+      // 1. Upload to Firebase Storage
+      const storage = getStorage(app)
+      const fileRef = ref(storage, `patients/${patientId}/documents/${Date.now()}_${file.name}`)
+      
+      const snapshot = await uploadBytes(fileRef, file)
+      const downloadURL = await getDownloadURL(snapshot.ref)
+      
+      // 2. Save URL to database
+      const res = await fetch('/api/patient/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId,
+          fileName: title,
+          fileType: file.type,
+          fileUrl: downloadURL,
         })
+      })
 
-        if (!res.ok) throw new Error('Upload failed')
-        
-        showToast('Document uploaded successfully!', 'success')
-        setTitle('')
-        setFile(null)
-        fetchDocuments()
-      }
+      if (!res.ok) throw new Error('Failed to save document record')
+      
+      showToast('Document uploaded successfully!', 'success')
+      setTitle('')
+      setFile(null)
+      fetchDocuments()
     } catch (e: any) {
       showToast(e.message || 'Upload failed', 'error')
     } finally {
@@ -364,10 +368,15 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
                     size="sm" 
                     className="text-xs h-8 text-blue-600 border-blue-200"
                     onClick={() => {
-                      // Open Base64 in new tab or download
-                      const win = window.open();
-                      if (win) {
-                        win.document.write(`<iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+                      // Open URL in new tab
+                      if (doc.fileData.startsWith('http')) {
+                        window.open(doc.fileData, '_blank');
+                      } else {
+                        // Fallback for old base64 docs (if any)
+                        const win = window.open();
+                        if (win) {
+                          win.document.write(`<iframe src="${doc.fileData}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+                        }
                       }
                     }}
                   >

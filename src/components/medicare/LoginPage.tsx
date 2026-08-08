@@ -22,8 +22,11 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50/80 via-white to-emerald-50/80">
-      <Card className="w-full max-w-md border-0 shadow-xl">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50/80 via-white to-emerald-50/80 relative">
+      <Button variant="ghost" className="absolute left-4 top-4 text-slate-500" onClick={() => setView('landing')}>
+        <ArrowLeft className="w-4 h-4 mr-2" /> Back
+      </Button>
+      <Card className="w-full max-w-md border-0 shadow-xl mt-8">
         <CardHeader className="text-center pb-2">
           <div className="w-16 h-16 rounded-2xl gradient-medical flex items-center justify-center mx-auto mb-4">
             <Stethoscope className="w-8 h-8 text-white" />
@@ -45,6 +48,11 @@ export function LoginPage() {
                   className="border-blue-200 focus:border-blue-400 pr-10" />
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                   {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <div className="flex justify-end mt-2">
+                <button type="button" onClick={() => setView('forgot-password')} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  Forgot Password?
                 </button>
               </div>
             </div>
