@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     // Send the email via Resend
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'Doctors Care <support@doctorscare.online>',
       to: email,
       subject: 'Reset your Doctors Care password',
       html: `
