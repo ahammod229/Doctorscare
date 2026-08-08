@@ -16,7 +16,7 @@ const statusColor: Record<string, string> = {
 }
 
 export function DoctorDashboard() {
-  const { user, appointments, loadAppointments, loadStats, stats, confirmAppointment, completeAppointment, createPrescription, showToast } = useApp()
+  const { user, appointments, loadAppointments, loadStats, stats, confirmAppointment, completeAppointment, createPrescription, showToast, selectAppointment } = useApp()
   const [tab, setTab] = useState<'today' | 'all' | 'completed'>('today')
   const [rxOpen, setRxOpen] = useState(false)
   const [rxApt, setRxApt] = useState<any>(null)
@@ -41,9 +41,8 @@ export function DoctorDashboard() {
   const handleRxSubmit = async () => {
     if (!rxApt || !rxForm.diagnosis || !rxForm.medications) { showToast('Fill diagnosis and medications', 'error'); return }
     await createPrescription({
-      appointmentId: rxApt.id, doctorId: user!.id, patientId: rxApt.patientId,
-      diagnosis: rxForm.diagnosis, medications: rxForm.medications,
-      instructions: rxForm.instructions, followUpDate: rxForm.followUpDate,
+      appointmentId: rxApt.id, doctorId: rxApt.doctorId, patientId: rxApt.patientId,
+      ...rxForm
     })
     setRxOpen(false); setRxForm({ diagnosis: '', medications: '', instructions: '', followUpDate: '' })
     loadAppointments(undefined, doctorId)
@@ -113,10 +112,13 @@ export function DoctorDashboard() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                 <Badge className={statusColor[apt.status]}>{apt.status}</Badge>
                 {apt.prescription && <Badge className="bg-emerald-100 text-emerald-700"><FileText className="w-3 h-3 mr-1" /> Rx</Badge>}
                 <ViewRecordsDialog patientId={apt.patientId} patientName={apt.patient?.name} />
+                <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => selectAppointment(apt)}>
+                  View
+                </Button>
                 {apt.status === 'PENDING' && (
                   <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => { confirmAppointment(apt.id).then(() => loadAppointments(undefined, doctorId)) }}>
                     Confirm
