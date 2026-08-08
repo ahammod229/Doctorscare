@@ -248,11 +248,8 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
   const fetchDocuments = async () => {
     if (!patientId) return;
     try {
-      const res = await fetch(`/api/patient/documents?patientId=${patientId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setDocuments(data)
-      }
+      const data = await api(`/api/patient/documents?patientId=${patientId}`)
+      setDocuments(data)
     } catch (e) {
       console.error(e)
     } finally {
@@ -323,8 +320,7 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this document?')) return
     try {
-      const res = await fetch(`/api/patient/documents?id=${id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to delete')
+      await api(`/api/patient/documents?id=${id}`, { method: 'DELETE' })
       showToast('Document deleted', 'success')
       fetchDocuments()
     } catch (e: any) {
