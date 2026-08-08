@@ -13,6 +13,8 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
 
+  const [simulatedLink, setSimulatedLink] = useState<string | null>(null)
+
   const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -33,12 +35,9 @@ export function ForgotPasswordPage() {
       
       // Development testing aid: if a simulated link is returned, show it
       if (data.simulatedLink) {
+        setSimulatedLink(data.simulatedLink)
         console.log("Simulated Email Reset Link:", data.simulatedLink)
-        showToast('Dev Mode: Reset link logged to console', 'info')
-        // Automatically set view for seamless dev testing (optional)
-        const params = new URLSearchParams(data.simulatedLink.split('?')[1])
-        window.history.pushState({}, '', data.simulatedLink)
-        // Let user click link or we can manually parse, we'll let user check console or toast
+        // We do not push state automatically to prevent confusion
       }
     } catch (err: any) {
       showToast(err.message, 'error')
@@ -88,6 +87,28 @@ export function ForgotPasswordPage() {
               <div className="bg-emerald-50 text-emerald-700 p-4 rounded-lg text-sm border border-emerald-100">
                 We've sent a password reset link to <strong>{email}</strong>. Please check your inbox and spam folder.
               </div>
+
+              {simulatedLink && (
+                <div className="mt-4 p-4 border border-blue-200 bg-blue-50 rounded-lg text-left">
+                  <p className="text-sm font-semibold text-blue-800 mb-2">
+                    Testing Mode (No Email Provider Configured)
+                  </p>
+                  <p className="text-xs text-blue-600 mb-3">
+                    Since you don't have an email provider like Resend or Sendgrid connected, we have generated the secure reset link directly below for testing.
+                  </p>
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => {
+                      const params = new URLSearchParams(simulatedLink.split('?')[1])
+                      window.history.pushState({}, '', simulatedLink)
+                      setView('reset-password')
+                    }}
+                  >
+                    Click here to Reset Password
+                  </Button>
+                </div>
+              )}
+
               <Button variant="outline" className="w-full border-slate-200" onClick={() => setView('login')}>
                 Return to Login
               </Button>
