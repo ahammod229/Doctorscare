@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Clock, DollarSign, Briefcase, GraduationCap, MapPin, Star } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Banknote, Briefcase, GraduationCap, MapPin, Star } from 'lucide-react'
 
 export function DoctorProfile() {
   const { selectedDoctor: doc, timeSlots, loadTimeSlots, bookAppointment, user, setView } = useApp()
@@ -66,7 +66,7 @@ export function DoctorProfile() {
               <div><p className="text-slate-400 text-xs">Experience</p><p className="font-semibold text-slate-700">{doc.experience} years</p></div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50">
-              <DollarSign className="w-5 h-5 text-emerald-500" />
+              <Banknote className="w-5 h-5 text-emerald-500" />
               <div><p className="text-slate-400 text-xs">Consultation Fee</p><p className="font-semibold text-slate-700">৳{doc.fee}</p></div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-sky-50">

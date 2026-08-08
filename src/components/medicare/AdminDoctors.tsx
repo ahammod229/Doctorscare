@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Stethoscope, Plus, Trash2, Edit, Search, GraduationCap, Briefcase, DollarSign } from 'lucide-react'
+import { Stethoscope, Plus, Trash2, Edit, Search, GraduationCap, Briefcase, Banknote } from 'lucide-react'
 
 export function AdminDoctors() {
   const { doctors, loadDoctors, departments, loadDepartments, showToast } = useApp()
@@ -88,7 +88,7 @@ export function AdminDoctors() {
                     <div className="flex flex-wrap gap-1 mt-1">
                       <Badge variant="secondary" className="text-xs">{doc.department.name}</Badge>
                       <Badge variant="outline" className="text-xs">{doc.experience}yr</Badge>
-                      <Badge variant="outline" className="text-xs">${doc.fee}</Badge>
+                      <Badge variant="outline" className="text-xs">৳{doc.fee}</Badge>
                     </div>
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export function AdminDoctors() {
             <div><Label>Qualification</Label><Input value={form.qualification} onChange={e => setForm(f => ({ ...f, qualification: e.target.value }))} className="mt-1 border-blue-200" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Experience (yrs)</Label><Input type="number" value={form.experience} onChange={e => setForm(f => ({ ...f, experience: e.target.value }))} className="mt-1 border-blue-200" /></div>
-              <div><Label>Fee ($)</Label><Input type="number" value={form.fee} onChange={e => setForm(f => ({ ...f, fee: e.target.value }))} className="mt-1 border-blue-200" /></div>
+              <div><Label>Fee (৳)</Label><Input type="number" value={form.fee} onChange={e => setForm(f => ({ ...f, fee: e.target.value }))} className="mt-1 border-blue-200" /></div>
             </div>
             <div><Label>Department *</Label>
               <Select value={form.departmentId} onValueChange={v => setForm(f => ({ ...f, departmentId: v }))}>

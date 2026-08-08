@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Users, Stethoscope, Calendar, DollarSign, Building2, CheckCircle2, XCircle, Clock, Plus, Trash2, Edit, TrendingUp, AlertCircle, FileText } from 'lucide-react'
+import { Users, Stethoscope, Calendar, Banknote, Building2, CheckCircle2, XCircle, Clock, Plus, Trash2, Edit, TrendingUp, AlertCircle, FileText } from 'lucide-react'
 
 const statusColor: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700', CONFIRMED: 'bg-blue-100 text-blue-700',
@@ -33,7 +33,7 @@ export function AdminDashboard() {
           { label: 'Total Doctors', value: stats?.totalDoctors || 0, icon: <Stethoscope className="w-5 h-5" />, color: 'text-blue-600 bg-blue-50', gradient: 'from-blue-500 to-blue-600' },
           { label: 'Patients', value: stats?.totalPatients || 0, icon: <Users className="w-5 h-5" />, color: 'text-emerald-600 bg-emerald-50', gradient: 'from-emerald-500 to-emerald-600' },
           { label: 'Appointments', value: stats?.totalAppointments || 0, icon: <Calendar className="w-5 h-5" />, color: 'text-sky-600 bg-sky-50', gradient: 'from-sky-500 to-sky-600' },
-          { label: 'Revenue', value: `$${stats?.totalRevenue || 0}`, icon: <DollarSign className="w-5 h-5" />, color: 'text-green-600 bg-green-50', gradient: 'from-green-500 to-green-600' },
+          { label: 'Revenue', value: `৳${stats?.totalRevenue || 0}`, icon: <Banknote className="w-5 h-5" />, color: 'text-green-600 bg-green-50', gradient: 'from-green-500 to-green-600' },
           { label: 'Departments', value: stats?.totalDepartments || 0, icon: <Building2 className="w-5 h-5" />, color: 'text-violet-600 bg-violet-50', gradient: 'from-violet-500 to-violet-600' },
         ].map((s, i) => (
           <Card key={i} className="border-0 shadow-sm hover:shadow-md transition">

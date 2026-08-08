@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Search, Filter, Star, MapPin, Clock, DollarSign, ArrowRight, GraduationCap, Briefcase } from 'lucide-react'
+import { Search, Filter, Star, MapPin, Clock, Banknote, ArrowRight, GraduationCap, Briefcase } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function BrowseDoctors() {
@@ -66,7 +66,7 @@ export function BrowseDoctors() {
                 <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-emerald-400" /> {doc.experience} years experience</p>
                 <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-sky-400" /> {doc.department.name}</p>
                 <p className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-400" /> {doc.availableDays}</p>
-                <p className="flex items-center gap-2"><DollarSign className="w-4 h-4 text-green-500" /> ৳{doc.fee} consultation fee</p>
+                <p className="flex items-center gap-2"><Banknote className="w-4 h-4 text-green-500" /> ৳{doc.fee} consultation fee</p>
               </div>
 
               <Button className="w-full gradient-medical text-white border-0" onClick={() => { selectDoctor(doc); setView('doctor-profile') }}>
