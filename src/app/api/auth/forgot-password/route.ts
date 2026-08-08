@@ -1,38 +1,69 @@
 import { db } from '@/lib/db'
 import { NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
+import crypto from 'crypto'
+import { Resend } from 'resend'
+
+// Use environment variable to prevent leaking keys in source control
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json()
-    if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
 
-    const user = await db.user.findUnique({ where: { email } })
-    if (!user) {
-      // Don't leak whether the email exists or not
-      return NextResponse.json({ success: true, message: 'If an account exists, a reset link has been sent.' })
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    const resetToken = uuidv4()
+    const user = await db.user.findUnique({ where: { email } })
+
+    // We shouldn't reveal if a user exists or not for security reasons
+    if (!user) {
+      return NextResponse.json({ success: true }) 
+    }
+
+    // Generate a secure random token
+    const resetToken = crypto.randomBytes(32).toString('hex')
     const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 hour from now
 
+    // Save token to database
     await db.user.update({
       where: { id: user.id },
-      data: { resetToken, resetTokenExpiry }
+      data: {
+        resetToken,
+        resetTokenExpiry
+      }
     })
 
-    // Simulate sending email by logging to console and returning in response for testing
-    // In a production app, use an email provider like Resend or SendGrid here
-    const resetLink = `/?view=reset-password&token=${resetToken}`
-    console.log(`[Email Simulation] Reset password link for ${email}: ${resetLink}`)
+    // Create the reset link using the actual host domain
+    const origin = req.headers.get('origin') || 'https://doctorscare-dbms.vercel.app'
+    const resetLink = `${origin}/?token=${resetToken}`
+
+    // Send the email via Resend
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject: 'Reset your Doctors Care password',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+          <h2 style="color: #0d9488;">Doctors Care</h2>
+          <p>Hello ${user.name},</p>
+          <p>We received a request to reset your password. Click the button below to choose a new password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="background-color: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reset Password</a>
+          </div>
+          <p style="color: #666; font-size: 14px;">If you didn't request this, you can safely ignore this email. This link will expire in 1 hour.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+          <p style="color: #999; font-size: 12px; text-align: center;">Doctors Care Application</p>
+        </div>
+      `
+    })
 
     return NextResponse.json({ 
-      success: true, 
-      message: 'If an account exists, a reset link has been sent.',
-      // Returning token only for testing purposes since no email provider is configured
-      simulatedLink: resetLink 
+      success: true 
     })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Failed to request password reset' }, { status: 500 })
+    
+  } catch (error) {
+    console.error('Forgot password error:', error)
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
   }
 }
