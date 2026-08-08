@@ -113,21 +113,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-10 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg gradient-medical flex items-center justify-center">
-                <span className="text-white text-lg">+</span>
-              </div>
-              <span className="text-lg font-bold">Doctors Care</span>
-            </div>
-            <p className="text-slate-400 text-sm">Doctor Appointment Management System — DBMS Project</p>
-            <div className="flex items-center gap-1 text-sm text-slate-400"><Phone className="w-4 h-4" /> Emergency: 999</div>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
