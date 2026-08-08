@@ -50,6 +50,7 @@ interface AppContextType extends AppState {
   selectAppointment: (a: Appointment) => void
   showToast: (message: string, type: 'success' | 'error' | 'info') => void
   refreshAdminAppointments: (status?: string, date?: string) => Promise<void>
+  api: (url: string, options?: RequestInit) => Promise<any>
 }
 
 const AppContext = createContext<AppContextType | null>(null)
@@ -230,7 +231,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const ctx: AppContextType = {
     ...state, setView, setUser, login, register, logout, loadDoctors, loadDepartments, loadAppointments,
     loadStats, loadTimeSlots, bookAppointment, cancelAppointment, confirmAppointment, completeAppointment,
-    createPrescription, selectDoctor, selectAppointment, showToast, refreshAdminAppointments,
+    createPrescription, selectDoctor, selectAppointment, showToast, refreshAdminAppointments, api,
   }
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>
 }
