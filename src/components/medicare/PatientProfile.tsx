@@ -238,7 +238,7 @@ export function PatientProfile() {
 }
 
 function PatientDocuments({ patientId }: { patientId?: string }) {
-  const { showToast } = useApp()
+  const { showToast, api } = useApp()
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
