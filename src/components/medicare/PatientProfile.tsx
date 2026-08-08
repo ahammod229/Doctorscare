@@ -271,40 +271,51 @@ function PatientDocuments({ patientId }: { patientId?: string }) {
       return
     }
 
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('File size must be less than 3MB', 'error')
+      return
+    }
+
     setUploading(true)
     try {
-      // 1. Upload to Firebase Storage
-      const storage = getStorage(app)
-      const fileRef = ref(storage, `patients/${patientId}/documents/${Date.now()}_${file.name}`)
+      // Read file as Base64
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
       
-      const snapshot = await uploadBytes(fileRef, file)
-      const downloadURL = await getDownloadURL(snapshot.ref)
+      reader.onload = async () => {
+        const base64String = reader.result as string
+        
+        try {
+          const res = await api('/api/patient/documents', {
+            method: 'POST',
+            body: JSON.stringify({
+              patientId,
+              fileName: title,
+              fileType: file.type,
+              fileUrl: base64String, // We pass base64 into the fileUrl field
+            })
+          })
+          
+          showToast('Document uploaded successfully!', 'success')
+          setTitle('')
+          setFile(null)
+          fetchDocuments()
+        } catch (e: any) {
+          console.error("Upload error:", e)
+          showToast(e.message || 'Upload failed. Please try again.', 'error')
+        } finally {
+          setUploading(false)
+        }
+      }
+
+      reader.onerror = () => {
+        showToast('Failed to read file on your device', 'error')
+        setUploading(false)
+      }
       
-      // 2. Save URL to database
-      await api('/api/patient/documents', {
-        method: 'POST',
-        body: JSON.stringify({
-          patientId,
-          fileName: title,
-          fileType: file.type,
-          fileUrl: downloadURL,
-        })
-      })
-      
-      showToast('Document uploaded successfully!', 'success')
-      setTitle('')
-      setFile(null)
-      fetchDocuments()
     } catch (e: any) {
       console.error("Upload error:", e)
-      if (e.message?.includes("unauthorized") || e.code === "storage/unauthorized") {
-        showToast('Storage Permission Denied. Please enable Firebase Storage rules.', 'error')
-      } else if (e.message?.includes("bucket")) {
-        showToast('Firebase Storage is not enabled in your Firebase Console.', 'error')
-      } else {
-        showToast(e.message || 'Upload failed. Please check console.', 'error')
-      }
-    } finally {
+      showToast(e.message || 'Upload failed. Please check console.', 'error')
       setUploading(false)
     }
   }

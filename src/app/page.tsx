@@ -47,10 +47,20 @@ function AppRouter() {
         {pages[view] || <LandingPage />}
       </main>
       {view === 'landing' && (
-        <footer className="bg-slate-900 text-white py-8 px-4 mt-auto">
-          <div className="max-w-7xl mx-auto text-center">
-            <p className="text-slate-400 text-sm">Doctors Care Doctor Appointment Management System</p>
-            <p className="text-slate-500 text-xs mt-1">DBMS Project 2026</p>
+        <footer className="bg-slate-900 text-white py-12 px-4 mt-auto">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
+            <div>
+              <h3 className="text-lg font-bold">Doctors Care</h3>
+              <p className="text-slate-400 text-sm mt-1">Doctor Appointment Management System</p>
+              <p className="text-slate-500 text-xs mt-1">DBMS Project 2026</p>
+            </div>
+            <div className="text-slate-400 text-sm">
+              <p className="font-semibold text-slate-300 mb-2">Contact Us</p>
+              <a href="mailto:support@doctorscare.online" className="hover:text-white transition-colors flex items-center justify-center md:justify-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                support@doctorscare.online
+              </a>
+            </div>
           </div>
         </footer>
       )}
